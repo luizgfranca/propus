@@ -17,10 +17,11 @@ export class Lexer {
     let character: string;
     while ((character = iterator.getNextCharacter())) {
       tokenBuffer.appendContent(character);
-
-      if (!character) accumulator.push(tokenBuffer);
     }
 
+    console.log(tokenBuffer);
+
+    accumulator.push(tokenBuffer);
     return accumulator;
   }
 }
