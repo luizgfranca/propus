@@ -1,6 +1,7 @@
 export enum TokenType {
+  NONE,
   TAG,
-  TEXT,
+  CONTENT,
 }
 
 export class Token {
@@ -8,7 +9,7 @@ export class Token {
   content: string;
 
   constructor(type?: TokenType) {
-    (this.type = type ? type : TokenType.TEXT), (this.content = "");
+    (this.type = type ? type : TokenType.NONE), (this.content = "");
   }
 
   appendContent(str: string) {
