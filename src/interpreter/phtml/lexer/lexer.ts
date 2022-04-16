@@ -1,4 +1,4 @@
-import { StringIterator } from "../../general/stringIterator";
+import { StringIterator } from "../../lib/stringIterator";
 import { ErrorMessage } from "./error";
 import { Expression } from "./expression";
 import { SpecialCharacter } from "./specialCharacter";
