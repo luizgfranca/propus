@@ -8,8 +8,9 @@ export class Token {
   type: TokenType;
   content: string;
 
-  constructor(type?: TokenType) {
-    (this.type = type ? type : TokenType.NONE), (this.content = "");
+  constructor(type?: TokenType, content?: string) {
+    this.type = type ? type : TokenType.NONE;
+    this.content = content ? content : "";
   }
 
   appendContent(str: string) {
