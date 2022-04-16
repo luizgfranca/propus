@@ -1,6 +1,7 @@
 import { StringIterator } from "../../general/stringIterator";
 import { ErrorMessage } from "./error";
 import { Expression } from "./expression";
+import { SpecialCharacter } from "./specialCharacter";
 import { Token, TokenType } from "./token";
 
 enum State {
@@ -14,6 +15,7 @@ export class Lexer {
   #accumulator: Token[] = [];
   #tokenBuffer: Token;
   #state: State = State.NONE;
+  #lastCharacter: string = SpecialCharacter.VOID;
 
   public doLex(str: string): Token[] {
     const iterator = new StringIterator(str);
@@ -22,6 +24,7 @@ export class Lexer {
     let character: string;
     while ((character = iterator.getNextCharacter())) {
       this.processCharacter(character);
+      this.#lastCharacter = character;
     }
 
     if (this.#tokenBuffer.type !== TokenType.NONE)
@@ -31,8 +34,18 @@ export class Lexer {
   }
 
   private processCharacter(char: string) {
+    if (
+      char === SpecialCharacter.NEW_LINE ||
+      char === SpecialCharacter.TAB_SPACE ||
+      (this.#lastCharacter === SpecialCharacter.BLANK_SPACE &&
+        char === SpecialCharacter.BLANK_SPACE)
+    )
+      return;
+
     switch (this.#state) {
       case State.NONE:
+        if (char === SpecialCharacter.BLANK_SPACE) return;
+
         if (char === Expression.OPEN_TAG) return this.beginTagToken(char);
 
         if (char === Expression.CLOSE_TAG) throw ErrorMessage.UNMATCHED_CLOSURE;
