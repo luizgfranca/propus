@@ -3,6 +3,7 @@ import { ErrorMessage } from "./error";
 import { Expression } from "./expression";
 import { SpecialCharacter } from "./specialCharacter";
 import { Token, TokenType } from "./token";
+import { IteratorExpressionMatcher } from "../../lib/iteratorExpressionMatcher";
 
 enum State {
   NONE,
@@ -16,6 +17,10 @@ export class Lexer {
   #tokenBuffer: Token;
   #state: State = State.NONE;
   #lastCharacter: string = SpecialCharacter.VOID;
+
+  #propTester = new IteratorExpressionMatcher(Expression.PROP_PREFIX, {
+    caseSensitive: false,
+  });
 
   public doLex(str: string): Token[] {
     const iterator = new StringIterator(str);
@@ -53,8 +58,12 @@ export class Lexer {
         return this.beginContentToken(char);
 
       case State.INSIDE_TAG:
+        if (this.#propTester.testNextCharacter(char))
+          this.#tokenBuffer.flags.hasProp = true;
+
         if (char === Expression.CLOSE_TAG) {
           this.#tokenBuffer.appendContent(char);
+          this.#propTester.reset();
           return this.commitToken();
         }
 

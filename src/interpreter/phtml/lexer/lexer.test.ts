@@ -41,3 +41,23 @@ test("tag containing other tag and text inside", () => {
     new Token(TokenType.TAG, "</div>"),
   ]);
 });
+
+test("One of the tags containing a prop", () => {
+  const lexer = new Lexer();
+  const result = lexer.doLex(
+    `<div class="test">
+      <h1 prop::test>this is a title</h1>
+      And this is some complimentary text
+     </div>
+    `
+  );
+
+  expect(result).toStrictEqual([
+    new Token(TokenType.TAG, '<div class="test">'),
+    new Token(TokenType.TAG, "<h1 prop::test>", { hasProp: true }),
+    new Token(TokenType.CONTENT, "this is a title"),
+    new Token(TokenType.TAG, "</h1>"),
+    new Token(TokenType.CONTENT, "And this is some complimentary text "),
+    new Token(TokenType.TAG, "</div>"),
+  ]);
+});
