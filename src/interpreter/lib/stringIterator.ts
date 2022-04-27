@@ -1,3 +1,4 @@
+// TODO: Maybe it's better rewrite this as a javascript generator
 export class StringIterator {
   private str: string;
   private position: number;

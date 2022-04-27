@@ -1,7 +1,7 @@
-import { Token } from "./token";
+import { Token } from "../model/token";
 
 const { Lexer } = require("./lexer");
-const { TokenType } = require("./token");
+const { TokenType } = require("../model/token");
 
 test("with plain text input should return only a text token", () => {
   const lexer = new Lexer();

@@ -2,7 +2,7 @@ import { StringIterator } from "../../lib/stringIterator";
 import { ErrorMessage } from "./error";
 import { Expression } from "./expression";
 import { SpecialCharacter } from "./specialCharacter";
-import { Token, TokenType } from "./token";
+import { Token, TokenType } from "../model/token";
 import { IteratorExpressionMatcher } from "../../lib/iteratorExpressionMatcher";
 
 enum State {
