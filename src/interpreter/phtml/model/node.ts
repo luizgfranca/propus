@@ -13,8 +13,14 @@ export class Node {
   }
 
   public addChild(child: Node) {
-    if (this.isAddChildOperationAllowed) this.childs.push(child);
+    if (this.isAddChildOperationAllowed) return this.childs.push(child);
 
     throw ErrorMessage.NOT_PROCESSED_ELEMENT_ADD_CHILD;
+  }
+
+  public getLastChild() {
+    if (!this.childs.length) return null;
+
+    return this.childs[this.childs.length - 1];
   }
 }
