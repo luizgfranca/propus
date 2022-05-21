@@ -1,17 +1,18 @@
 import { Root } from "../model/root";
-import { Token } from "../model/token";
+import { Token, TokenType } from "../model/token";
 import { Node } from "../model/node";
 import { NotProcessedToken } from "../model/notProcessedElement";
+import { ElementParser } from "./elementParser";
+import { Element } from "../model/element";
 import { Content } from "../model/content";
-import { TokenParser } from "./tokenParser";
 
 export class Parser {
   #treeRoot: Root;
   #cursor: Node;
-  #tokenParser: TokenParser;
+  #elementParser: ElementParser;
 
   constructor() {
-    this.#tokenParser = new TokenParser();
+    this.#elementParser = new ElementParser();
   }
 
   public doParse(tokens: Token[]): Root {
@@ -28,15 +29,26 @@ export class Parser {
     return this.#cursor.getLastChild() as NotProcessedToken;
   }
 
-  private parseTokenToNodes(token: Token): Content | Element {
-    return this.#tokenParser.parse(this.#cursor, token);
+  private parseElement(token: Token): Element {
+    const element = this.#elementParser.parse(this.#cursor, token);
+    this.#cursor.addChild(element);
+    return this.#cursor.getLastChild() as Element;
+  }
+
+  private parseContent(token: Token): Content {
+    return new Content(this.#cursor, "");
   }
 
   private handleToken(token: Token) {
     let newCursor: Node | null = null;
 
-    if (!token.flags.hasProp) newCursor = this.handleNotToBeProcessed(token);
-    else this.parseTokenToNodes(token);
+    if (!token.flags.hasProp) {
+      newCursor = this.handleNotToBeProcessed(token);
+    } else if (token.type === TokenType.TAG) {
+      newCursor = this.parseElement(token);
+    } else if (token.type === TokenType.CONTENT) {
+      newCursor = this.parseContent(token);
+    }
 
     this.#cursor = newCursor as Node;
   }

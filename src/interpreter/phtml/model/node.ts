@@ -1,3 +1,5 @@
+import { ErrorMessage } from "./error";
+
 export class Node {
   parent?: Node;
   childs: Node[];

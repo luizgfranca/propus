@@ -608,13 +608,6 @@
   dependencies:
     "@types/node" "*"
 
-"@types/html-pdf@^3.0.0":
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/@types/html-pdf/-/html-pdf-3.0.0.tgz#25f402eb143af3e4655a537ff6e0cd4d190f07a1"
-  integrity sha512-YAcS/lAgA4VzY7DrerIYPENFg7QtWa0nEEJhn2fw8o8tlEjVyx37kgaM1tAO7MTI4bNB8Ilaxip1tIjkPsMKtg==
-  dependencies:
-    "@types/node" "*"
-
 "@types/istanbul-lib-coverage@*", "@types/istanbul-lib-coverage@^2.0.0", "@types/istanbul-lib-coverage@^2.0.1":
   version "2.0.4"
   resolved "https://registry.yarnpkg.com/@types/istanbul-lib-coverage/-/istanbul-lib-coverage-2.0.4.tgz#8467d4b3c087805d63580480890791277ce35c44"
@@ -1633,6 +1626,11 @@ flatted@^3.1.0:
   version "3.2.4"
   resolved "https://registry.yarnpkg.com/flatted/-/flatted-3.2.4.tgz#28d9969ea90661b5134259f312ab6aa7929ac5e2"
   integrity sha512-8/sOawo8tJ4QOBX8YlQBMxL8+RLZfxMQOif9o0KUKTNTjMYElWPE0r/m5VNFxTRd0NSw8qSy8dajrwX4RYI1Hw==
+
+flatted@^3.2.5:
+  version "3.2.5"
+  resolved "https://registry.yarnpkg.com/flatted/-/flatted-3.2.5.tgz#76c8584f4fc843db64702a6bd04ab7a8bd666da3"
+  integrity sha512-WIWGi2L3DyTUvUrwRKgGi9TwxQMUEqPOPQBVi71R96jZXJdFskXEmf54BoZaS1kknGODoIGASGEzBUYdyMCBJg==
 
 forever-agent@~0.6.1:
   version "0.6.1"

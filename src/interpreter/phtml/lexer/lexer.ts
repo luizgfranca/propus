@@ -1,7 +1,7 @@
 import { StringIterator } from "../../lib/stringIterator";
-import { ErrorMessage } from "./error";
-import { Expression } from "./expression";
-import { SpecialCharacter } from "./specialCharacter";
+import { ErrorMessage } from "../error";
+import { Expression } from "../model/expression";
+import { SpecialCharacter } from "../model/specialCharacter";
 import { Token, TokenType } from "../model/token";
 import { IteratorExpressionMatcher } from "../../lib/iteratorExpressionMatcher";
 
