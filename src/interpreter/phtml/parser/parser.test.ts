@@ -35,3 +35,21 @@ test("parse a tag that contains a prop", () => {
     Flatted.toJSON(tree)
   );
 });
+
+test("parse a tag with attributes that contains a prop", () => {
+  const content = '<img src="test.png" class="test-image" prop:test />';
+  const tokens = [new Token(TokenType.TAG, content, { hasProp: true })];
+
+  const tree = new Root();
+  const tag = new Element(tree, Tag.IMG);
+  tag.isSelfEnclosed = true;
+  tag.addAttribute("src", "test.png");
+  tag.addAttribute("class", "test-image");
+  tag.props["test"] = true;
+  tree.addChild(tag);
+
+  const parser = new Parser();
+  expect(Flatted.toJSON(parser.doParse(tokens))).toStrictEqual(
+    Flatted.toJSON(tree)
+  );
+});

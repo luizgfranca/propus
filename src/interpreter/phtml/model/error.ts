@@ -8,4 +8,7 @@ export const ErrorMessage = {
   MISPLACED_SYMBOL: (symbol: string) => `Misplaced symbol: ${symbol}`,
   DATA_AFTER_CLOSED: "Internal error: Token has more than one element",
   INFO_AFTER_FINISHED: "Invalid content after element is finished",
+  ATTRIBUTE_NAME_OR_VALUE_NULL:
+    "Internal error: attribute name or value used but not assigned",
+  INVALID_PROP_NAME: "Invalid prop name",
 };

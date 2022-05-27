@@ -6,7 +6,7 @@ import { ErrorMessage } from "./error";
 
 export class Element extends Node {
   tag: Tag;
-  attributes: Dictionary<string>;
+  attributes: Dictionary<string | boolean>;
   props: Props;
   isElementCloser: boolean;
   isSelfEnclosed: boolean;
@@ -20,7 +20,7 @@ export class Element extends Node {
     this.isElementCloser = false;
   }
 
-  public addAttribute(key: string, value: string) {
+  public addAttribute(key: string, value: string | boolean) {
     if (!key || !value) throw ErrorMessage.ELEMENT_INVALID_ATTR_PARAMS;
 
     if (typeof key !== "string" || typeof value !== "string")

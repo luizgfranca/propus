@@ -1,3 +1,3 @@
 export interface Props {
-  test?: string;
+  test?: boolean;
 }
