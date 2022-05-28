@@ -38,7 +38,7 @@ export class Template {
     return content;
   }
 
-  private extractDatasetBand(template: string): htmlParser.HTMLElement {
+  private extractDatasetBand(template: string): htmlParser.HTMLElement | null {
     const root = htmlParser.parse(template);
     return root.querySelector(
       this.CLASS_SELECTOR_SYMBOL + this.DATASET_CLASS_NAME
@@ -89,8 +89,10 @@ export class Template {
     }
 
     const datasetBand = this.extractDatasetBand(this.content);
+    if(!datasetBand) throw 'could not get datasetBand'
+    
     const datasetContentList = this.renderDatasetContent(datasetBand, dataset);
-
+    
     this.content = this.content.replace(
       datasetBand.toString(),
       concatStringArray(datasetContentList)
