@@ -42,6 +42,8 @@ export class ElementParser {
   #attributeAccumulator: Attribute = {};
   #propTester: IteratorExpressionMatcher;
 
+  #isInsideBracket: boolean = false;
+
   public parse(parent: Node, token: Token): Element {
     this.resetState();
     this.#parent = parent;
@@ -65,6 +67,15 @@ export class ElementParser {
   private processCharacter(char: string) {
     if (this.#state === ElementParserState.ELEMENT_CLOSED) {
       throw ErrorMessage.DATA_AFTER_CLOSED;
+    }
+
+    if (
+      (this.#state === ElementParserState.ON_ATTRIBUTE_VALUE ||
+        this.#state === ElementParserState.ON_PROP_VALUE) &&
+      char !== SpecialCharacter.BRACKET
+    ) {
+      this.#attributeAccumulator.value += char;
+      return;
     }
 
     if (char === Expression.OPEN_TAG) {
@@ -102,7 +113,33 @@ export class ElementParser {
         this.#state = ElementParserState.WAITING_ATTRIBUTE;
       }
 
+      if (
+        this.#state === ElementParserState.ON_PROP_NAME &&
+        this.#attributeAccumulator.name
+      ) {
+        // @ts-expect-error ts(7053)
+        this.#element.props[this.#attributeAccumulator.name] = true;
+        this.resetAttributeAccumlator();
+        this.#state = ElementParserState.WAITING_ATTRIBUTE;
+        return;
+      }
+
+      if (
+        this.#state === ElementParserState.ON_ATTRIBUTE_VALUE ||
+        this.#state === ElementParserState.ON_PROP_VALUE
+      ) {
+        throw ErrorMessage.UNCONTAINED_VALUE;
+      }
+    }
+
+    if (char === SpecialCharacter.BRACKET) {
       if (this.#state === ElementParserState.ON_ATTRIBUTE_VALUE) {
+        if (!this.#isInsideBracket) {
+          this.#isInsideBracket = true;
+          return;
+        }
+
+        this.#isInsideBracket = false;
         const { name, value } = this.#attributeAccumulator;
         if (!name || !value) throw ErrorMessage.ATTRIBUTE_NAME_OR_VALUE_NULL;
 
@@ -113,6 +150,11 @@ export class ElementParser {
       }
 
       if (this.#state === ElementParserState.ON_PROP_VALUE) {
+        if (!this.#isInsideBracket) {
+          this.#isInsideBracket = true;
+          return;
+        }
+
         if (
           !this.#attributeAccumulator.name ||
           this.#attributeAccumulator.value
@@ -132,6 +174,8 @@ export class ElementParser {
       char === Expression.PROP_DELIMITER &&
       this.#state === ElementParserState.WAITING_PROP
     ) {
+      this.resetAttributeAccumlator();
+      this.#attributeAccumulator.name = SpecialCharacter.VOID;
       this.#state = ElementParserState.ON_PROP_NAME;
     }
 
@@ -152,6 +196,7 @@ export class ElementParser {
 
       if (this.#state === ElementParserState.WAITING_ATTRIBUTE) {
         this.#attributeAccumulator.name = char;
+        this.#propTester.testNextCharacter(char);
         this.#state = ElementParserState.ON_ATTRIBUTE_NAME;
         return;
       }
@@ -171,14 +216,6 @@ export class ElementParser {
         return;
       }
 
-      if (
-        this.#state === ElementParserState.ON_ATTRIBUTE_VALUE ||
-        this.#state === ElementParserState.ON_PROP_VALUE
-      ) {
-        this.#attributeAccumulator.value += char;
-        return;
-      }
-
       throw ErrorMessage.MISPLACED_SYMBOL(char);
     }
 
@@ -192,12 +229,7 @@ export class ElementParser {
       }
 
       if (this.#state === ElementParserState.ON_PROP_NAME) {
-        if (
-          this.#attributeAccumulator.name &&
-          Object.keys(this.#element.props).includes(
-            this.#attributeAccumulator.name.toLowerCase()
-          )
-        ) {
+        if (this.#attributeAccumulator.name) {
           this.#state = ElementParserState.ON_PROP_VALUE;
           this.#attributeAccumulator.value = SpecialCharacter.VOID;
           return;
