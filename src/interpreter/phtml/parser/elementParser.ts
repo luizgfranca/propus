@@ -92,24 +92,13 @@ export class ElementParser {
         throw ErrorMessage.INFO_AFTER_FINISHED;
 
       if (this.#state === ElementParserState.ON_TAG_TITLE) {
-        const tagName = this.#tagNameAccumulator.toUpperCase();
-
-        if (!this.#possibleTags.includes(tagName as Tag))
-          throw ErrorMessage.INVALID_TAG;
-
-        // @ts-ignore: ts(7015)
-        this.#element.tag = Tag[tagName];
-
+        this.setTag();
         this.#state = ElementParserState.WAITING_ATTRIBUTE;
         return;
       }
 
       if (this.#state === ElementParserState.ON_ATTRIBUTE_NAME) {
-        const { name, value } = this.#attributeAccumulator;
-        if (!name) throw ErrorMessage.ATTRIBUTE_NAME_OR_VALUE_NULL;
-
-        this.#element.addAttribute(name, value ? value : true);
-        this.resetAttributeAccumlator();
+        this.saveAttribute();
         this.#state = ElementParserState.WAITING_ATTRIBUTE;
       }
 
@@ -117,9 +106,7 @@ export class ElementParser {
         this.#state === ElementParserState.ON_PROP_NAME &&
         this.#attributeAccumulator.name
       ) {
-        // @ts-expect-error ts(7053)
-        this.#element.props[this.#attributeAccumulator.name] = true;
-        this.resetAttributeAccumlator();
+        this.saveProp();
         this.#state = ElementParserState.WAITING_ATTRIBUTE;
         return;
       }
@@ -140,11 +127,8 @@ export class ElementParser {
         }
 
         this.#isInsideBracket = false;
-        const { name, value } = this.#attributeAccumulator;
-        if (!name || !value) throw ErrorMessage.ATTRIBUTE_NAME_OR_VALUE_NULL;
 
-        this.#element.addAttribute(name, value);
-        this.resetAttributeAccumlator();
+        this.saveAttribute();
         this.#state = ElementParserState.WAITING_ATTRIBUTE;
         return;
       }
@@ -161,10 +145,7 @@ export class ElementParser {
         )
           throw ErrorMessage.ATTRIBUTE_NAME_OR_VALUE_NULL;
 
-        // @ts-expect-error ts(7053)
-        this.#element.props[this.#attributeAccumulator.name] =
-          this.#attributeAccumulator.value;
-        this.resetAttributeAccumlator();
+        this.saveProp();
         this.#state = ElementParserState.WAITING_ATTRIBUTE;
         return;
       }
@@ -250,7 +231,6 @@ export class ElementParser {
 
       if (this.#state === ElementParserState.ELEMENT_OPEN) {
         this.#element.isElementCloser = true;
-        this.#state = ElementParserState.ON_FINISHED_ELEMENT;
         return;
       }
 
@@ -265,7 +245,49 @@ export class ElementParser {
         this.#state = ElementParserState.ELEMENT_CLOSED;
         return;
       }
+
+      if (this.#state === ElementParserState.ON_TAG_TITLE) {
+        this.setTag();
+        this.#state = ElementParserState.ELEMENT_CLOSED;
+        return;
+      }
+
+      if (
+        this.#state === ElementParserState.ON_PROP_NAME &&
+        this.#attributeAccumulator.name
+      ) {
+        this.saveProp();
+        this.#state = ElementParserState.ELEMENT_CLOSED;
+        return;
+      }
     }
+  }
+
+  private setTag() {
+    const tagName = this.#tagNameAccumulator.toUpperCase();
+
+    if (!this.#possibleTags.includes(tagName as Tag))
+      throw ErrorMessage.INVALID_TAG;
+
+    // @ts-ignore: ts(7015)
+    this.#element.tag = Tag[tagName];
+  }
+
+  private saveAttribute() {
+    const { name, value } = this.#attributeAccumulator;
+    if (!name) throw ErrorMessage.ATTRIBUTE_NAME_OR_VALUE_NULL;
+
+    this.#element.addAttribute(name, value ? value : true);
+    this.resetAttributeAccumlator();
+  }
+
+  private saveProp() {
+    // @ts-expect-error ts(7053)
+    this.#element.props[this.#attributeAccumulator.name] = this
+      .#attributeAccumulator.value
+      ? this.#attributeAccumulator.value
+      : true;
+    this.resetAttributeAccumlator();
   }
 
   private resetAttributeAccumlator() {

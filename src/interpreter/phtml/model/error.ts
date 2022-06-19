@@ -11,5 +11,7 @@ export const ErrorMessage = {
   ATTRIBUTE_NAME_OR_VALUE_NULL:
     "Internal error: attribute name or value used but not assigned",
   INVALID_PROP_NAME: "Invalid prop name",
-  UNCONTAINED_VALUE: "Uncontained attribute or property value"
+  UNCONTAINED_VALUE: "Uncontained attribute or property value",
+  TAG_WITHOUT_PARENT: "Internal error: Closing tag has no parent assigned",
+  UNMATCHED_CLOSER_TAG: "Unmached closer tag",
 };

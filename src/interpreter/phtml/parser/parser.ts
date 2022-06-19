@@ -5,11 +5,14 @@ import { NotProcessedToken } from "../model/notProcessedElement";
 import { ElementParser } from "./elementParser";
 import { Element } from "../model/element";
 import { Content } from "../model/content";
+import { ErrorMessage } from "../model/error";
 
 export class Parser {
   #treeRoot: Root;
   #cursor: Node;
   #elementParser: ElementParser;
+
+  #processingDepth: number = 0;
 
   constructor() {
     this.#elementParser = new ElementParser();
@@ -31,6 +34,32 @@ export class Parser {
 
   private parseElement(token: Token): Element {
     const element = this.#elementParser.parse(this.#cursor, token);
+
+    if (token.flags.hasProp) {
+      this.#processingDepth++;
+    }
+
+    if (element.isElementCloser) {
+      if (!this.#cursor.parent) throw ErrorMessage.TAG_WITHOUT_PARENT;
+
+      if (
+        this.#cursor.isAddChildOperationAllowed &&
+        (this.#cursor as Element).tag === element.tag
+      ) {
+        return this.#cursor as Element;
+      }
+
+      if (
+        this.#cursor.parent.isAddChildOperationAllowed &&
+        (this.#cursor.parent as Element).tag === element.tag
+      ) {
+        element.setParent(this.#cursor.parent);
+        return this.#cursor.parent as Element;
+      }
+
+      throw ErrorMessage.UNMATCHED_CLOSER_TAG;
+    }
+
     this.#cursor.addChild(element);
     return this.#cursor.getLastChild() as Element;
   }
@@ -42,7 +71,7 @@ export class Parser {
   private handleToken(token: Token) {
     let newCursor: Node | null = null;
 
-    if (!token.flags.hasProp) {
+    if (!token.flags.hasProp && this.#processingDepth === 0) {
       newCursor = this.handleNotToBeProcessed(token);
     } else if (token.type === TokenType.TAG) {
       newCursor = this.parseElement(token);

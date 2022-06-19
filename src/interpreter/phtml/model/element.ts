@@ -28,4 +28,8 @@ export class Element extends Node {
 
     this.attributes[key] = value;
   }
+
+  public setParent(parent: Node) {
+    this.parent = parent;
+  }
 }
