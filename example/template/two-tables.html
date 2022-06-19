@@ -1,0 +1,39 @@
+<html>
+  <body>
+    <table>
+      <td>
+        <tr>
+          <h1>Table 1</h1>
+        </tr>
+      </td>
+    </table>
+  </body>
+</html>
+
+[ds1].value sum(ds1, 'value') "propus-map"
+
+<div class="component">
+  <div class="cell">{{ds1[0].id}}</div>
+  <div class="cell">{{ds1[0].value}}</div>
+</div>
+
+<!-- acho que deve ser inviavel -->
+<div class="propus-map" pp:dataset="{ds1, ds2}">
+  <div class="cell">{{[ds1].id}}</div>
+  <div class="cell">{{[ds1].value}}</div>
+</div>
+
+<div class="propus-map" pp:dataset="ds1" pp:iterator="item">
+  <div class="cell">{{item.id}}</div>
+  <div class="cell">{{item.value}}</div>
+</div>
+
+<div class="propus-map" pp:dataset="{ds1, ds2}" pp:iterator="{i, j}">
+  <div class="cell">{{i.id}}</div>
+  <div class="cell">{{j.value}}</div>
+</div>
+
+<div class="propus-map" pp:dataset="{...ds1, ...ds2}" pp:iterator="item">
+  <div class="cell">{{item.id}}</div>
+  <div class="cell">{{item.value}}</div>
+</div>
