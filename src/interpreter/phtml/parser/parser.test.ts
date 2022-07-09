@@ -77,3 +77,25 @@ test("parse a tag that contains a prop with another tag inside", () => {
     Flatted.toJSON(tree)
   );
 });
+
+test("parse a tag that contains a prop with content inside", () => {
+  const tokens = [
+    new Token(TokenType.TAG, '<div class="test" prop:test>', { hasProp: true }),
+    new Token(TokenType.CONTENT, "this is some content"),
+    new Token(TokenType.TAG, "</div>"),
+  ];
+
+  const tree = new Root();
+  const tag = new Element(tree, Tag.DIV);
+  tag.addAttribute("class", "test");
+  tag.props["test"] = true;
+  tree.addChild(tag);
+
+  const insideContent = new Content(tag, "this is some content");
+  tag.addChild(insideContent);
+
+  const parser = new Parser();
+  expect(Flatted.toJSON(parser.doParse(tokens))).toStrictEqual(
+    Flatted.toJSON(tree)
+  );
+});

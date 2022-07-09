@@ -64,8 +64,9 @@ export class Parser {
     return this.#cursor.getLastChild() as Element;
   }
 
-  private parseContent(token: Token): Content {
-    return new Content(this.#cursor, "");
+  private parseContent(token: Token) {
+    const content = new Content(this.#cursor, token.content);
+    this.#cursor.addChild(content);
   }
 
   private handleToken(token: Token) {
@@ -76,9 +77,11 @@ export class Parser {
     } else if (token.type === TokenType.TAG) {
       newCursor = this.parseElement(token);
     } else if (token.type === TokenType.CONTENT) {
-      newCursor = this.parseContent(token);
+      this.parseContent(token);
     }
 
-    this.#cursor = newCursor as Node;
+    if (newCursor) {
+      this.#cursor = newCursor as Node;
+    }
   }
 }
