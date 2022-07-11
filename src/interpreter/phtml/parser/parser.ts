@@ -46,7 +46,7 @@ export class Parser {
         this.#cursor.isAddChildOperationAllowed &&
         (this.#cursor as Element).tag === element.tag
       ) {
-        return this.#cursor as Element;
+        return this.#cursor.parent as Element;
       }
 
       if (

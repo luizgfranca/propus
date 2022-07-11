@@ -127,3 +127,41 @@ test("3 levels composition of to be processed tokens", () => {
     Flatted.toJSON(tree)
   );
 });
+
+test("deep processing in two points", () => {
+  const tokens = [
+    new Token(TokenType.TAG, '<div class="test" prop:test>', { hasProp: true }),
+    new Token(TokenType.TAG, '<div class="content-container">'),
+    new Token(TokenType.CONTENT, "this is some content"),
+    new Token(TokenType.TAG, "</div>"),
+    new Token(TokenType.TAG, '<div class="content-container">'),
+    new Token(TokenType.CONTENT, "this is some other content"),
+    new Token(TokenType.TAG, "</div>"),
+    new Token(TokenType.TAG, "</div>"),
+  ];
+
+  const tree = new Root();
+  const tag = new Element(tree, Tag.DIV);
+  tag.addAttribute("class", "test");
+  tag.props["test"] = true;
+  tree.addChild(tag);
+
+  const insideTag = new Element(tag, Tag.DIV);
+  insideTag.addAttribute("class", "content-container");
+  tag.addChild(insideTag);
+
+  const content = new Content(insideTag, "this is some content");
+  insideTag.addChild(content);
+
+  const otherTag = new Element(tag, Tag.DIV);
+  otherTag.addAttribute("class", "content-container");
+  tag.addChild(otherTag);
+
+  const otherContent = new Content(otherTag, "this is some other content");
+  otherTag.addChild(otherContent);
+
+  const parser = new Parser();
+  expect(Flatted.toJSON(parser.doParse(tokens))).toStrictEqual(
+    Flatted.toJSON(tree)
+  );
+});
