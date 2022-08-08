@@ -165,3 +165,55 @@ test("deep processing in two points", () => {
     Flatted.toJSON(tree)
   );
 });
+
+test("deep processing composed with not to be processed tokens", () => {
+  const tokens = [
+    new Token(TokenType.TAG, '<div class="container">'),
+    new Token(TokenType.TAG, '<div class="test" prop:test>', { hasProp: true }),
+    new Token(TokenType.TAG, '<div class="content-container">'),
+    new Token(TokenType.CONTENT, "this is some content"),
+    new Token(TokenType.TAG, "</div>"),
+    new Token(TokenType.TAG, '<div class="content-container">'),
+    new Token(TokenType.TAG, '<div class="deeper-container">'),
+    new Token(TokenType.CONTENT, "this is some other content"),
+    new Token(TokenType.TAG, "</div>"),
+    new Token(TokenType.TAG, "</div>"),
+    new Token(TokenType.TAG, "</div>"),
+    new Token(TokenType.TAG, "</div>"),
+  ];
+
+  const tree = new Root();
+
+  const notProcessed = new NotProcessedToken(tree, '<div class="container">');
+  tree.addChild(notProcessed);
+
+  const tag = new Element(tree, Tag.DIV);
+  tag.addAttribute("class", "test");
+  tag.props["test"] = true;
+  tree.addChild(tag);
+
+  const insideTag = new Element(tag, Tag.DIV);
+  insideTag.addAttribute("class", "content-container");
+  tag.addChild(insideTag);
+
+  const content = new Content(insideTag, "this is some content");
+  insideTag.addChild(content);
+
+  const otherTag = new Element(tag, Tag.DIV);
+  otherTag.addAttribute("class", "content-container");
+  tag.addChild(otherTag);
+
+  const deepTag = new Element(otherTag, Tag.DIV);
+  deepTag.addAttribute("class", "deeper-container");
+  otherTag.addChild(deepTag);
+
+  const otherContent = new Content(deepTag, "this is some other content");
+  deepTag.addChild(otherContent);
+
+  const notProcessedCloser = new NotProcessedToken(tree, "</div>");
+  tree.addChild(notProcessedCloser);
+
+  const parser = new Parser();
+  const parsedTree = parser.doParse(tokens);
+  expect(Flatted.toJSON(parsedTree)).toStrictEqual(Flatted.toJSON(tree));
+});

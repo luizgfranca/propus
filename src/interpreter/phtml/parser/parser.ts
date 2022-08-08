@@ -27,20 +27,18 @@ export class Parser {
     return this.#treeRoot;
   }
 
-  private handleNotToBeProcessed(token: Token): NotProcessedToken {
+  private handleNotToBeProcessed(token: Token): Node {
     this.#cursor.addChild(new NotProcessedToken(this.#cursor, token.content));
-    return this.#cursor.getLastChild() as NotProcessedToken;
+    return this.#cursor;
   }
 
   private parseElement(token: Token): Element {
     const element = this.#elementParser.parse(this.#cursor, token);
 
-    if (token.flags.hasProp) {
-      this.#processingDepth++;
-    }
-
     if (element.isElementCloser) {
       if (!this.#cursor.parent) throw ErrorMessage.TAG_WITHOUT_PARENT;
+
+      this.#processingDepth--;
 
       if (
         this.#cursor.isAddChildOperationAllowed &&
@@ -58,6 +56,8 @@ export class Parser {
       }
 
       throw ErrorMessage.UNMATCHED_CLOSER_TAG;
+    } else if (!element.isSelfEnclosed) {
+      this.#processingDepth++;
     }
 
     this.#cursor.addChild(element);
