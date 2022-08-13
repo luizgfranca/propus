@@ -37,7 +37,7 @@ test("tag containing other tag and text inside", () => {
     new Token(TokenType.TAG, "<h1>"),
     new Token(TokenType.CONTENT, "this is a title"),
     new Token(TokenType.TAG, "</h1>"),
-    new Token(TokenType.CONTENT, "And this is some complimentary text "),
+    new Token(TokenType.CONTENT, "And this is some complimentary text"),
     new Token(TokenType.TAG, "</div>"),
   ]);
 });
@@ -57,7 +57,7 @@ test("One of the tags containing a prop", () => {
     new Token(TokenType.TAG, "<h1 prop::test>", { hasProp: true }),
     new Token(TokenType.CONTENT, "this is a title"),
     new Token(TokenType.TAG, "</h1>"),
-    new Token(TokenType.CONTENT, "And this is some complimentary text "),
+    new Token(TokenType.CONTENT, "And this is some complimentary text"),
     new Token(TokenType.TAG, "</div>"),
   ]);
 });

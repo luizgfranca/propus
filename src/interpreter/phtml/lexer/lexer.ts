@@ -84,8 +84,10 @@ export class Lexer {
   }
 
   private commitToken() {
-    if (this.#tokenBuffer.type !== TokenType.NONE)
+    if (this.#tokenBuffer.type !== TokenType.NONE) {
+      this.#tokenBuffer.commit();
       this.#accumulator.push(this.#tokenBuffer);
+    }
 
     this.#state = State.NONE;
     this.#tokenBuffer = new Token();
