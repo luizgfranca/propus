@@ -5,4 +5,5 @@ export const Expression = {
   EQUALS: "=",
   PROP_DELIMITER: ":",
   PROP_PREFIX: "prop",
+  NEW_LINE: "\n",
 };
