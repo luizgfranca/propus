@@ -2,12 +2,13 @@ import { ExplorationContext, Root } from "../model/root";
 import { Node } from "../model/node";
 import { NotProcessedToken } from "../model/notProcessedElement";
 import { Expression } from "../model/expression";
+import { Content } from "../model/content";
 
 export class Compiler {
   contentBuffer = "";
 
   append(str: string) {
-    this.contentBuffer += str;
+    this.contentBuffer += str + Expression.NEW_LINE;
   }
 
   processElement(node: Node, explorationContext: ExplorationContext) {
@@ -16,7 +17,11 @@ export class Compiler {
       explorationContext === ExplorationContext.OPENNING
     ) {
       this.append((node as NotProcessedToken).content);
-      this.append(Expression.NEW_LINE);
+    } else if (
+      node instanceof Content &&
+      explorationContext === ExplorationContext.OPENNING
+    ) {
+      this.append((node as Content).content);
     }
   }
 
