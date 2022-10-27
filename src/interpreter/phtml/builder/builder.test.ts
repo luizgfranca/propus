@@ -1,7 +1,9 @@
 import { Content } from "../model/content";
 import { NotProcessedToken } from "../model/notProcessedElement";
 import { Root } from "../model/root";
+import { Element } from "../model/element";
 import { Compiler } from "./builder";
+import { Tag } from "../model/tag";
 
 test("should return empty string when only the root exists", () => {
   const tree = new Root();
@@ -33,4 +35,14 @@ test("should mount Contents elements as their content is", () => {
   expect(compiler.doCompilation(tree)).toBe(
     '<div class="container">\nthis is some content\n</div>\n'
   );
+});
+
+test("should mount and close tag elements with no params' strings correctly", () => {
+  const tree = new Root();
+
+  const tag = new Element(tree, Tag.DIV);
+  tree.addChild(tag);
+
+  const compiler = new Compiler();
+  expect(compiler.doCompilation(tree)).toBe("<div>\n</div>\n");
 });
