@@ -46,3 +46,14 @@ test("should mount and close tag elements with no params' strings correctly", ()
   const compiler = new Compiler();
   expect(compiler.doCompilation(tree)).toBe("<div>\n</div>\n");
 });
+
+test("should build elements with an attribute", () => {
+  const tree = new Root();
+
+  const element = new Element(tree, Tag.DIV);
+  element.addAttribute("class", "test");
+  tree.addChild(element);
+
+  const compiler = new Compiler();
+  expect(compiler.doCompilation(tree)).toBe('<div class="test">\n</div>\n');
+});
