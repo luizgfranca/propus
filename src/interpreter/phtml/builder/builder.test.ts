@@ -57,3 +57,14 @@ test("should build elements with an attribute", () => {
   const compiler = new Compiler();
   expect(compiler.doCompilation(tree)).toBe('<div class="test">\n</div>\n');
 });
+
+test("should build self-enclosed elements", () => {
+  const tree = new Root();
+
+  const element = new Element(tree, Tag.BR);
+  element.isSelfEnclosed = true;
+  tree.addChild(element);
+
+  const compiler = new Compiler();
+  expect(compiler.doCompilation(tree)).toBe("<br/>\n");
+});

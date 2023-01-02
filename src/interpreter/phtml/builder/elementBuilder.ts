@@ -4,7 +4,7 @@ import { Expression } from "../model/expression";
 import { SpecialCharacter } from "../model/specialCharacter";
 
 export default class ElementBuilder {
-  static attributes(element: Element, explorationContext: ExplorationContext) {
+  static attributes(element: Element) {
     let attributesStr = SpecialCharacter.VOID;
 
     for (const key of Object.keys(element.attributes)) {
@@ -20,6 +20,12 @@ export default class ElementBuilder {
     return attributesStr;
   }
 
+  static selfCloser(element: Element) {
+    return element.isSelfEnclosed
+      ? Expression.CLOSING_DASH
+      : SpecialCharacter.VOID;
+  }
+
   static build(
     element: Element,
     explorationContext: ExplorationContext
@@ -28,12 +34,16 @@ export default class ElementBuilder {
       return (
         Expression.OPEN_TAG +
         element.tag.toLowerCase() +
-        this.attributes(element, explorationContext) +
+        this.attributes(element) +
+        this.selfCloser(element) +
         Expression.CLOSE_TAG
       );
     }
 
-    if (explorationContext === ExplorationContext.CLOSING) {
+    if (
+      explorationContext === ExplorationContext.CLOSING &&
+      !element.isSelfEnclosed
+    ) {
       return (
         Expression.OPEN_TAG +
         Expression.CLOSING_DASH +
@@ -42,6 +52,6 @@ export default class ElementBuilder {
       );
     }
 
-    return "";
+    return SpecialCharacter.VOID;
   }
 }

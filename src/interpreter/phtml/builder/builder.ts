@@ -10,7 +10,7 @@ export class Compiler {
   contentBuffer = "";
 
   append(str: string) {
-    this.contentBuffer += str + Expression.NEW_LINE;
+    if (str) this.contentBuffer += str + Expression.NEW_LINE;
   }
 
   processContent(content: Content, explorationContext: ExplorationContext) {
