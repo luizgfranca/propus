@@ -106,3 +106,31 @@ test("should build nested elements with content inside the child", () => {
       "</div>\n"
   );
 });
+
+test("should build content with a self enclosed tag", () => {
+  const tree = new Root();
+
+  const parent = new Element(tree, Tag.DIV);
+  parent.addAttribute("class", "parent");
+  tree.addChild(parent);
+
+  const child = new Element(parent, Tag.DIV);
+  child.addAttribute("class", "child");
+  parent.addChild(child);
+
+  const content = new Content(child, "some content");
+  child.addChild(content);
+
+  const newLine = new Element(child, Tag.BR);
+  newLine.isSelfEnclosed = true;
+  child.addChild(newLine);
+
+  const compiler = new Compiler();
+  expect(compiler.doCompilation(tree)).toBe(
+    '<div class="parent">\n' +
+      '<div class="child">\n' +
+      "some content\n<br/>\n" +
+      "</div>\n" +
+      "</div>\n"
+  );
+});
