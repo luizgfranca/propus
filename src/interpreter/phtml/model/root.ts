@@ -31,7 +31,7 @@ export class Root extends Node {
 
     while (explorationHorizon.length || toCloseBacklog.length) {
       if (
-        (cursor && cursor.level < currentLevel) ||
+        (cursor && cursor.level >= currentLevel) ||
         (!explorationHorizon.length && cursor?.level !== 0)
       ) {
         const closing = toCloseBacklog.pop() as ExplorationElement;

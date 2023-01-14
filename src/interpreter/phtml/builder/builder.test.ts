@@ -82,3 +82,27 @@ test("should build nested elements", () => {
   const compiler = new Compiler();
   expect(compiler.doCompilation(tree)).toBe("<div>\n<br/>\n</div>\n");
 });
+
+test("should build nested elements with content inside the child", () => {
+  const tree = new Root();
+
+  const parent = new Element(tree, Tag.DIV);
+  parent.addAttribute("class", "parent");
+  tree.addChild(parent);
+
+  const child = new Element(parent, Tag.DIV);
+  child.addAttribute("class", "child");
+  parent.addChild(child);
+
+  const content = new Content(child, "some content");
+  child.addChild(content);
+
+  const compiler = new Compiler();
+  expect(compiler.doCompilation(tree)).toBe(
+    '<div class="parent">\n' +
+      '<div class="child">\n' +
+      "some content\n" +
+      "</div>\n" +
+      "</div>\n"
+  );
+});
