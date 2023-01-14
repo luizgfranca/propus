@@ -68,3 +68,17 @@ test("should build self-enclosed elements", () => {
   const compiler = new Compiler();
   expect(compiler.doCompilation(tree)).toBe("<br/>\n");
 });
+
+test("should build nested elements", () => {
+  const tree = new Root();
+
+  const parent = new Element(tree, Tag.DIV);
+  tree.addChild(parent);
+
+  const child = new Element(parent, Tag.BR);
+  child.isSelfEnclosed = true;
+  parent.addChild(child);
+
+  const compiler = new Compiler();
+  expect(compiler.doCompilation(tree)).toBe("<div>\n<br/>\n</div>\n");
+});
