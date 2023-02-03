@@ -4,6 +4,7 @@ import { Root } from "../model/root";
 import { Element } from "../model/element";
 import { Compiler } from "./builder";
 import { Tag } from "../model/tag";
+import { ChildProcess } from "child_process";
 
 test("should return empty string when only the root exists", () => {
   const tree = new Root();
@@ -130,6 +131,43 @@ test("should build content with a self enclosed tag", () => {
     '<div class="parent">\n' +
       '<div class="child">\n' +
       "some content\n<br/>\n" +
+      "</div>\n" +
+      "</div>\n"
+  );
+});
+
+test("should build mixed and combined with tags", () => {
+  const tree = new Root();
+
+  const parent = new Element(tree, Tag.DIV);
+  parent.addAttribute("class", "parent");
+  tree.addChild(parent);
+
+  const container = new Element(parent, Tag.DIV);
+  container.addAttribute("class", "container");
+  parent.addChild(container);
+
+  const titleTag = new Element(container, Tag.H1);
+  container.addChild(titleTag);
+
+  const titleText = new Content(titleTag, 'title')
+  titleTag.addChild(titleText);
+
+  const textBefore = new Content(container, 'some content')
+  container.addChild(textBefore);
+
+  const newLine = new Element(container, Tag.BR);
+  newLine.isSelfEnclosed = true;
+  container.addChild(newLine);
+
+  const textAfter = new Content(container, 'more content');
+  container.addChild(textAfter);
+
+  const compiler = new Compiler();
+  expect(compiler.doCompilation(tree)).toBe(
+    '<div class="parent">\n' +
+      '<div class="container">\n' +
+      "<h1>\ntitle\n</h1>\nsome content\n<br/>\nmore content\n" +
       "</div>\n" +
       "</div>\n"
   );

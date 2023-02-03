@@ -26,32 +26,22 @@ export default class ElementBuilder {
       : SpecialCharacter.VOID;
   }
 
-  static build(
-    element: Element,
-    explorationContext: ExplorationContext
-  ): string {
-    if (explorationContext === ExplorationContext.OPENNING) {
-      return (
-        Expression.OPEN_TAG +
-        element.tag.toLowerCase() +
-        this.attributes(element) +
-        this.selfCloser(element) +
-        Expression.CLOSE_TAG
-      );
-    }
+  static buildOpenner(element: Element) {
+    return (
+      Expression.OPEN_TAG +
+      element.tag.toLowerCase() +
+      this.attributes(element) +
+      this.selfCloser(element) +
+      Expression.CLOSE_TAG
+    );
+  }
 
-    if (
-      explorationContext === ExplorationContext.CLOSING &&
-      !element.isSelfEnclosed
-    ) {
-      return (
-        Expression.OPEN_TAG +
-        Expression.CLOSING_DASH +
-        element.tag.toLowerCase() +
-        Expression.CLOSE_TAG
-      );
-    }
-
-    return SpecialCharacter.VOID;
+  static buildCloser(element: Element) {
+    return !element.isSelfEnclosed
+      ? Expression.OPEN_TAG +
+          Expression.CLOSING_DASH +
+          element.tag.toLowerCase() +
+          Expression.CLOSE_TAG
+      : SpecialCharacter.VOID;
   }
 }

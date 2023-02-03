@@ -15,48 +15,52 @@ export class Root extends Node {
     super();
   }
 
-  public forEachTreeElement(
-    lambda: (node: Node, context: ExplorationContext) => void
+  public traverseTreeAndRun(
+    onOpen: (node: Node) => void,
+    onClose: (node: Node) => void
   ) {
-    const explorationHorizon: Array<ExplorationElement> = [];
-    const toCloseBacklog: Array<ExplorationElement> = [];
-    let currentLevel: number = 0;
+    let explorationHorizon: Array<ExplorationElement> = [];
+    let cursor: ExplorationElement | undefined = undefined;
 
     explorationHorizon.push({
       level: 0,
       node: this,
     });
 
-    let cursor: ExplorationElement | undefined;
-
-    while (explorationHorizon.length || toCloseBacklog.length) {
+    while (true) {
       if (
-        (cursor && cursor.level >= currentLevel) ||
-        (!explorationHorizon.length && cursor?.level !== 0)
+        cursor &&
+        (!explorationHorizon.length ||
+          explorationHorizon[0].level <= cursor.level)
       ) {
-        const closing = toCloseBacklog.pop() as ExplorationElement;
-        lambda(closing.node, ExplorationContext.CLOSING);
-        currentLevel--;
+        onClose(cursor.node);
+
+        if (!cursor.node.parent) break;
+
+        cursor = {
+          level: cursor.level - 1,
+          node: cursor.node.parent,
+        };
+      } else {
+        cursor = explorationHorizon.shift();
+        if (!cursor) throw "no cursor after shifting";
+
+        onOpen(cursor.node);
+
+        if (cursor.node.childs.length) {
+          const level = cursor.level;
+          const childs: Array<ExplorationElement> = cursor.node.childs.map(
+            (child) => {
+              return {
+                level: level + 1,
+                node: child,
+              };
+            }
+          );
+
+          explorationHorizon = childs.concat(explorationHorizon);
+        }
       }
-
-      cursor = explorationHorizon.shift();
-
-      if (!cursor) continue;
-
-      lambda(cursor.node, ExplorationContext.OPENNING);
-
-      if (cursor.node.childs.length) {
-        currentLevel++;
-
-        cursor.node.childs.forEach((child) =>
-          explorationHorizon.push({
-            node: child,
-            level: currentLevel,
-          })
-        );
-      }
-
-      toCloseBacklog.push(cursor);
     }
   }
 }

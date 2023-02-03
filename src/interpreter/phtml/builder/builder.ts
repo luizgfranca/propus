@@ -13,37 +13,43 @@ export class Compiler {
     if (str) this.contentBuffer += str + Expression.NEW_LINE;
   }
 
-  processContent(content: Content, explorationContext: ExplorationContext) {
-    if (explorationContext === ExplorationContext.OPENNING) {
-      this.append((content as NotProcessedToken).content);
-    }
+  processContent(content: Content) {
+    this.append((content as NotProcessedToken).content);
   }
 
-  processNotProcessedToken(
-    token: NotProcessedToken,
-    explorationContext: ExplorationContext
-  ) {
-    if (explorationContext === ExplorationContext.OPENNING) {
-      this.append((token as NotProcessedToken).content);
-    }
+  processNotProcessedToken(token: NotProcessedToken) {
+    this.append((token as NotProcessedToken).content);
   }
 
-  processElement(element: Element, explorationContext: ExplorationContext) {
-    this.append(ElementBuilder.build(element, explorationContext));
+  processOpenElement(element: Element) {
+    this.append(ElementBuilder.buildOpenner(element));
   }
 
-  processNode(node: Node, explorationContext: ExplorationContext) {
+  processCloseElement(element: Element) {
+    this.append(ElementBuilder.buildCloser(element));
+  }
+
+  processNodeOpenning(node: Node) {
     if (node instanceof NotProcessedToken) {
-      this.processNotProcessedToken(node, explorationContext);
+      this.processNotProcessedToken(node);
     } else if (node instanceof Content) {
-      this.processContent(node, explorationContext);
+      this.processContent(node);
     } else if (node instanceof Element) {
-      this.processElement(node, explorationContext);
+      this.processOpenElement(node);
+    }
+  }
+
+  processNodeClosing(node: Node) {
+    if (node instanceof Element) {
+      this.processCloseElement(node);
     }
   }
 
   doCompilation(tree: Root): string {
-    tree.forEachTreeElement(this.processNode.bind(this));
+    tree.traverseTreeAndRun(
+      (node: Node) => this.processNodeOpenning(node),
+      (node: Node) => this.processNodeClosing(node)
+    );
     return this.contentBuffer;
   }
 }
